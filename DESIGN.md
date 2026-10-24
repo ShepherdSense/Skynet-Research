@@ -449,6 +449,46 @@ more Substack newsletters.
   were not rechecked. Resources are research leads, not authorities;
   nothing here is regulation text.
 
+## 11b. Events — the Military Drone Events Register (added 2026-10-24)
+
+Draco's ask (with the register workbook
+`Military_Drone_Events_Register_2026-10-09__1.xlsx`): an events
+section inside the Resources tab. The register holds **74 events**
+(E001–E074, verified 2026-10-09): U.S. military, allied and
+defense-industry drone events — warfighter competitions (17),
+conferences/expos (9), technology and acquisition competitions,
+joint competitions/experiments, demonstrations/exercises, SOF
+assessments, industry days and cadet/STEM events. Statuses:
+Completed 40 · Announced dates 17 · Announced window 7 · Past
+schedule only 5 · Tentative planning 3 · Date unconfirmed 2.
+Exact-start dates run 2025-03-07 → 2027-05-17; 54 events carry an
+exact start, 20 do not (their full date is unverified). Every
+event carries a primary source URL; 18 carry a supporting one.
+
+- **UI**: a Sources | Events segmented control at the top of
+  the Resources tab (the tab count does not change). Events view:
+  free-text search (name, window, status, location, host,
+  category, focus, notes), status chips with counts, an
+  "Upcoming only" toggle (exact start today or later), newest
+  first by exact start with undated events last. Each event is
+  an expandable card: window, location, host, publisher, exact
+  dates (or "Exact dates not verified"), focus, participation,
+  evidence notes, and Primary / Supporting source buttons.
+- **Data**: `tool/build_events_bundle.py` reads the workbook
+  (sheet "Events", header row 8) and writes
+  `assets/events.json` (+ manifest). It **fails loudly** unless
+  the header matches exactly, all 74 rows are present in
+  E001–E074 order, every row has a name, window, status,
+  location, host, category, focus, notes and primary URL, every
+  status is in the register's own set, and every row is verified
+  2026-10-09. Re-run on a new register.
+- **Honesty**: the register's caveat rides in the UI —
+  public-source inventory (local, classified, unannounced and
+  older unit events may be missing); future dates remain subject
+  to change; "Past schedule only" means a published past date
+  without a reviewed completion report, and "Completed" means
+  occurrence corroborated.
+
 ## 12. Authorities home & the Shepherd fusion (structure, 2026-10-23)
 
 Draco's structure directive (via the main chat): top-level buttons per

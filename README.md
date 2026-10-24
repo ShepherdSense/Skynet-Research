@@ -82,6 +82,18 @@ landing page — it recolors the whole app, drone included.
   `tool/build_resources_bundle.py`, which reconciles every count
   against the catalogue's own totals before writing the bundle.
   Recovered records — live access not retested.
+- **Events (in Resources)** — the Military Drone Events Register:
+  74 U.S. military, allied and defense-industry drone events
+  (competitions, exercises, acquisition events, conferences,
+  cadet events), verified 2026-10-09, in a Sources | Events
+  switch at the top of the Resources tab. Search by name, place,
+  host or category, filter by status (Completed, Announced
+  dates/window, Past schedule only, Tentative planning, Date
+  unconfirmed) or flip on Upcoming only. Tap an event to expand
+  it: host, exact dates where verified, evidence notes, and
+  buttons to its primary and supporting sources. Built by
+  `tool/build_events_bundle.py` from the register workbook —
+  it fails loudly unless all 74 rows (E001–E074) reconcile.
 - **Plain English (stub)** — hand-written samples for 14 CFR 107.51,
   14 CFR 107.49, and 29 CFR 1910.95. Everything else honestly says
   "not written yet" instead of guessing.

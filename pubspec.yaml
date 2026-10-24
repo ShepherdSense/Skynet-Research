@@ -72,6 +72,10 @@ flutter:
     - assets/icon/icon.png
     - assets/resources.json
     - assets/resources_manifest.json
+    # Military drone events register — offline, see
+    # tool/build_events_bundle.py. Re-run on a new register.
+    - assets/events.json
+    - assets/events_manifest.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:
