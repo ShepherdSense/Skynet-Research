@@ -1,0 +1,37 @@
+{
+ "register": "Military Drone Events Register",
+ "verifiedAsOf": "2026-10-09",
+ "entries": 74,
+ "byStatus": {
+  "Completed": 40,
+  "Date unconfirmed": 2,
+  "Past schedule only": 5,
+  "Announced window": 7,
+  "Announced dates": 17,
+  "Tentative planning": 3
+ },
+ "byCategory": {
+  "Warfighter competition": 17,
+  "Military–industry competition": 4,
+  "Joint competition/experimentation": 6,
+  "Conference and competition": 1,
+  "Industry day": 1,
+  "International military competition": 3,
+  "Acquisition competition": 7,
+  "Technology competition": 8,
+  "Military demonstration/exercise": 6,
+  "International military exercise": 1,
+  "SOF technology assessment": 3,
+  "Industry field demonstration": 3,
+  "Conference/expo": 9,
+  "Military symposium": 1,
+  "Related military robotics competition": 2,
+  "Cadet/STEM competition": 2
+ },
+ "exactStartRange": [
+  "2025-03-07",
+  "2027-05-17"
+ ],
+ "withExactStart": 54,
+ "withSupportingUrl": 18
+}
