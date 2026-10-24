@@ -1,0 +1,270 @@
+{
+ "catalogue": "All scheduled research sources",
+ "catalogueDate": "2026-10-23",
+ "entries": 3419,
+ "byPlatform": {
+  "Reddit": 66,
+  "X": 127,
+  "LinkedIn": 388,
+  "YouTube": 138,
+  "Facebook": 54,
+  "Instagram": 16,
+  "Threads": 3,
+  "GitHub": 9,
+  "Website": 2609,
+  "Substack": 6,
+  "Bluesky": 3
+ },
+ "topTags": [
+  [
+   "General reference",
+   1044
+  ],
+  [
+   "RAS",
+   668
+  ],
+  [
+   "UAS",
+   519
+  ],
+  [
+   "Software",
+   267
+  ],
+  [
+   "Finance",
+   264
+  ],
+  [
+   "Russia",
+   233
+  ],
+  [
+   "Manufacturing",
+   217
+  ],
+  [
+   "Policy",
+   213
+  ],
+  [
+   "AI/ML",
+   209
+  ],
+  [
+   "AUSA",
+   208
+  ],
+  [
+   "Ukraine",
+   188
+  ],
+  [
+   "UGV",
+   177
+  ],
+  [
+   "Sensors",
+   146
+  ],
+  [
+   "CUAS",
+   135
+  ],
+  [
+   "Iran",
+   132
+  ],
+  [
+   "OSINT",
+   119
+  ],
+  [
+   "USV",
+   115
+  ],
+  [
+   "Africa",
+   110
+  ],
+  [
+   "Cyber",
+   104
+  ],
+  [
+   "Asia",
+   94
+  ],
+  [
+   "Acquisition",
+   93
+  ],
+  [
+   "RF",
+   92
+  ],
+  [
+   "PNT",
+   92
+  ],
+  [
+   "Health",
+   91
+  ],
+  [
+   "EW",
+   84
+  ],
+  [
+   "Middle East",
+   83
+  ],
+  [
+   "Europe",
+   81
+  ],
+  [
+   "UUV",
+   79
+  ],
+  [
+   "Comms",
+   76
+  ],
+  [
+   "Space",
+   74
+  ],
+  [
+   "BRICS",
+   69
+  ],
+  [
+   "Army",
+   63
+  ],
+  [
+   "China",
+   53
+  ],
+  [
+   "Latin America",
+   46
+  ],
+  [
+   "COCOM",
+   41
+  ],
+  [
+   "Veterans",
+   37
+  ],
+  [
+   "SOF",
+   36
+  ],
+  [
+   "Training",
+   36
+  ],
+  [
+   "Global news",
+   33
+  ],
+  [
+   "Navy",
+   28
+  ]
+ ],
+ "topReports": [
+  [
+   "INVEST",
+   1354
+  ],
+  [
+   "BRICS-R",
+   1284
+  ],
+  [
+   "BRICS-U",
+   1284
+  ],
+  [
+   "NEWS",
+   1191
+  ],
+  [
+   "RU",
+   1169
+  ],
+  [
+   "POLICY",
+   1153
+  ],
+  [
+   "IRAN",
+   1019
+  ],
+  [
+   "GLOBAL-M",
+   936
+  ],
+  [
+   "UAS-W",
+   847
+  ],
+  [
+   "LINKEDIN-M",
+   843
+  ],
+  [
+   "LINKEDIN-W",
+   839
+  ],
+  [
+   "VET-BEN",
+   263
+  ],
+  [
+   "AUSA",
+   208
+  ],
+  [
+   "DOC-HUNT",
+   127
+  ],
+  [
+   "NC-UAS",
+   65
+  ],
+  [
+   "ROBOTICS-REF",
+   57
+  ],
+  [
+   "COCOM",
+   51
+  ],
+  [
+   "VA-RATE",
+   14
+  ],
+  [
+   "OTHER-REF",
+   9
+  ],
+  [
+   "HOME",
+   2
+  ]
+ ],
+ "parseStats": {
+  "entries": 3419,
+  "with_url": 3419,
+  "with_tags": 3419,
+  "with_reports": 3419,
+  "with_kind": 3419,
+  "no_url_names": []
+ }
+}

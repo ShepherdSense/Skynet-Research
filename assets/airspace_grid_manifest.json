@@ -1,0 +1,11 @@
+{
+  "dataset": "FAA UAS Facility Maps (LAANC altitude grids)",
+  "source": "https://services6.arcgis.com/ssFJjBXIUyZDrSYZ/arcgis/rest/services/FAA_UAS_FacilityMap_Data/FeatureServer/0",
+  "records_downloaded": 380860,
+  "cells_after_reduction": 380860,
+  "map_effective": "10/1/2026",
+  "generated_on": "2026-10-23",
+  "cell_size_degrees": 0.008333333333333333,
+  "format": "PRG1: uvarint row-delta, zigzag-varint col-delta, uvarint ceiling(ft); overlaps keep minimum ceiling",
+  "refresh": "Re-run tool/build_airspace_bundle.py each 56-day aeronautical chart cycle."
+}
