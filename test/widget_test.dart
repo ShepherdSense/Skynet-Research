@@ -176,6 +176,69 @@ void main() {
     expect(find.textContaining('effective 10/1/2026'), findsOneWidget);
   });
 
+  testWidgets('wizard plan step asks the southern border question', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(home: FlyCheckScreen(services: _services())),
+    );
+    await tester.pumpAndSettle();
+
+    // Light recreational: registration and Remote ID steps are skipped.
+    await tester.tap(find.text('For Fun'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // -> weight
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Under 0.55 pounds (250 grams)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // -> credential
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // -> airspace
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // -> plan
+    await tester.pumpAndSettle();
+
+    expect(find.text('About this flight:'), findsOneWidget);
+    expect(
+      find.text(
+        'Will you fly within 1 nautical mile north of the '
+        'U.S.-Mexico border?',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('wizard airspace step asks work flyers about tower inspections',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(home: FlyCheckScreen(services: _services())),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Commercial'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // -> weight
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('0.55 to 55 pounds'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // -> registration
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // -> credential
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // -> remoteId
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next')); // -> airspace
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Are you inspecting a vertical structure (tower, '
+        'high-rise) above the LAANC grid ceiling?',
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('shepherd flow: group, munitions, location -> fused summary', (
     tester,
   ) async {
