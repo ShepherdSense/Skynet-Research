@@ -54,6 +54,25 @@ class FlyAnswers {
 
   /// Part 107 night flying: current night training + anti-collision light.
   TriState nightReady = TriState.unknown;
+
+  /// Southern border drone TFR: the flight is within 1 nautical mile
+  /// north of the U.S.-Mexico border. Null = question not asked.
+  bool? nearSouthernBorder;
+
+  /// CBP approval for a flight inside the border TFR zone, requested at
+  /// least 48 hours ahead. Only evaluated when nearSouthernBorder is true.
+  TriState cbpApproval = TriState.unknown;
+
+  /// Part 107 vertical-structure inspection (tower, high-rise) above the
+  /// LAANC grid ceiling. Null = question not asked.
+  bool? verticalStructureInspection;
+
+  /// Meets ALL FAA Order JO 7200.23E ¶3-5 criteria: within a 100-foot
+  /// radius of the structure, no more than 100 feet above its top, at
+  /// least 2 nautical miles from any landing surface, visual line of
+  /// sight, 3 statute miles visibility, and cloud clearance. Only
+  /// evaluated when verticalStructureInspection is true.
+  TriState withinStructureLimits = TriState.unknown;
 }
 
 class RuleOutcome {
@@ -140,6 +159,18 @@ const _airspace107Ref = RegulationRef(
   section: '107.41',
   heading: 'Operation in certain airspace',
 );
+const _borderTfrRef = RegulationRef(
+  sourceId: 'notam',
+  titleNumber: 0,
+  heading: 'Southern border drone temporary flight restriction',
+  citationLabel: 'FAA NOTAMs ZLA 6/9954, ZAB 6/9978, ZHU 6/9956',
+);
+const _jo720023eRef = RegulationRef(
+  sourceId: 'faa-order',
+  titleNumber: 0,
+  heading: 'Processing of Unmanned Aircraft Systems Requests',
+  citationLabel: 'FAA Order JO 7200.23E, ¶3-5',
+);
 const _limitsRef = RegulationRef(
   sourceId: 'sample',
   titleNumber: 14,
@@ -206,6 +237,13 @@ FlyCheckResult evaluateFlyCheck(FlyAnswers a) {
   final rec = a.purpose == FlyPurpose.recreational;
   final outcomes = <RuleOutcome>[];
   final conditions = <String>[];
+
+  // JO 7200.23E ¶3-5 fast path: a qualifying tower inspection in
+  // controlled airspace goes through FAADroneZone, never LAANC — the
+  // airspace fixes below must not send such a flight to LAANC.
+  final towerFastPath = !rec &&
+      a.verticalStructureInspection == true &&
+      a.withinStructureLimits == TriState.yes;
 
   // --- Weight gate ---------------------------------------------------------
   final weightKnown = a.weight != null && a.weight != WeightClass.unknown;
@@ -517,29 +555,44 @@ FlyCheckResult evaluateFlyCheck(FlyAnswers a) {
         case TriState.no:
           outcomes.add(
             RuleOutcome(
-              title: 'Get LAANC authorization for this spot',
+              title: towerFastPath
+                  ? 'Get FAADroneZone authorization for this inspection'
+                  : 'Get LAANC authorization for this spot',
               status: OutcomeStatus.fixable,
               plainWhy:
                   'Your location is in a $ceiling-foot LAANC grid square — '
                   'controlled airspace. The grid tells you the most LAANC '
                   'can approve here; it is not itself an approval.',
-              fix:
-                  'Request authorization in an FAA-approved LAANC app '
-                  'before takeoff — approval is usually automatic within '
-                  'minutes, up to $ceiling feet at this spot.',
+              fix: towerFastPath
+                  ? 'This inspection flies above the grid ceiling, so '
+                        'LAANC cannot approve it. Request a Part 107 '
+                        'airspace authorization in FAADroneZone instead — '
+                        'see the tower-inspection outcome below. It is a '
+                        'manual process: allow weeks, not minutes.'
+                  : 'Request authorization in an FAA-approved LAANC app '
+                        'before takeoff — approval is usually automatic within '
+                        'minutes, up to $ceiling feet at this spot.',
               ref: rec ? _statuteRef : _airspace107Ref,
             ),
           );
         case TriState.unknown:
           outcomes.add(
             RuleOutcome(
-              title: 'Do you have LAANC authorization for this spot?',
+              title: towerFastPath
+                  ? 'Do you have FAADroneZone authorization for this '
+                        'inspection?'
+                  : 'Do you have LAANC authorization for this spot?',
               status: OutcomeStatus.check,
-              plainWhy:
-                  'Your location is in a $ceiling-foot LAANC grid square — '
-                  'controlled airspace, so you need authorization before '
-                  'takeoff. If you haven\'t requested it in a LAANC app, '
-                  'you don\'t have it yet.',
+              plainWhy: towerFastPath
+                  ? 'Your location is in a $ceiling-foot LAANC grid square — '
+                        'controlled airspace, so you need authorization before '
+                        'takeoff. For this tower inspection the authorization '
+                        'comes from FAADroneZone, not LAANC: LAANC cannot '
+                        'approve above the grid ceiling.'
+                  : 'Your location is in a $ceiling-foot LAANC grid square — '
+                        'controlled airspace, so you need authorization before '
+                        'takeoff. If you haven\'t requested it in a LAANC app, '
+                        'you don\'t have it yet.',
               ref: rec ? _statuteRef : _airspace107Ref,
             ),
           );
@@ -579,10 +632,15 @@ FlyCheckResult evaluateFlyCheck(FlyAnswers a) {
                 plainWhy:
                     'Flying in controlled airspace (near most airports) '
                     'requires FAA authorization before takeoff.',
-                fix:
-                    'Use a LAANC app (FAA-approved providers, e.g. via '
-                    'B4UFLY) — approval is usually automatic within minutes, '
-                    'up to the altitude shown on the grid for that spot.',
+                fix: towerFastPath
+                    ? 'This inspection needs a Part 107 airspace '
+                          'authorization from FAADroneZone — LAANC cannot '
+                          'approve above the grid ceiling. See the '
+                          'tower-inspection outcome below. (Manual process: '
+                          'allow weeks, not minutes.)'
+                    : 'Use a LAANC app (FAA-approved providers, e.g. via '
+                          'B4UFLY) — approval is usually automatic within minutes, '
+                          'up to the altitude shown on the grid for that spot.',
                 ref: rec ? _statuteRef : _airspace107Ref,
               ),
             );
@@ -591,10 +649,13 @@ FlyCheckResult evaluateFlyCheck(FlyAnswers a) {
               RuleOutcome(
                 title: 'Do you have airspace authorization?',
                 status: OutcomeStatus.check,
-                plainWhy:
-                    'Controlled airspace requires authorization before '
-                    'takeoff. If you haven\'t requested it in a LAANC app, '
-                    'you don\'t have it yet.',
+                plainWhy: towerFastPath
+                    ? 'Controlled airspace requires authorization before '
+                          'takeoff. For this tower inspection that '
+                          'authorization comes from FAADroneZone, not LAANC.'
+                    : 'Controlled airspace requires authorization before '
+                          'takeoff. If you haven\'t requested it in a LAANC app, '
+                          'you don\'t have it yet.',
                 ref: rec ? _statuteRef : _airspace107Ref,
               ),
             );
@@ -610,6 +671,144 @@ FlyCheckResult evaluateFlyCheck(FlyAnswers a) {
             fix:
                 'Check the free FAA B4UFLY app for the exact spot — it '
                 'tells you the airspace and the max approved altitude.',
+          ),
+        );
+    }
+  }
+
+  // --- Southern border drone TFR (Oct 20, 2026 – Oct 19, 2027) -----------
+  // Applies to every drone, recreational and Part 107 alike. Unasked
+  // (null) stays silent: the plan step asks the question, and a user
+  // who never answers it gets no border outcome.
+  if (a.nearSouthernBorder == true) {
+    switch (a.cbpApproval) {
+      case TriState.yes:
+        outcomes.add(
+          const RuleOutcome(
+            title: 'Border zone flight — CBP approval on file',
+            status: OutcomeStatus.pass,
+            plainWhy:
+                'You have CBP approval for this flight inside the southern '
+                'border restriction zone. Stay inside the terms of that '
+                'approval — the zone runs from the surface to 400 feet '
+                'within 1 nautical mile north of the U.S.-Mexico border, '
+                'through October 19, 2027.',
+            ref: _borderTfrRef,
+          ),
+        );
+      case TriState.no:
+        outcomes.add(
+          const RuleOutcome(
+            title: 'Southern border restriction — no unauthorized flights',
+            status: OutcomeStatus.blocked,
+            plainWhy:
+                'Unauthorized drone flights are barred from the surface to '
+                '400 feet above the ground within 1 nautical mile north of '
+                'the U.S.-Mexico border, from the Pacific coast to the Gulf '
+                'coast, from October 20, 2026 through October 19, 2027. '
+                'This covers every drone, including recreational models.',
+            fix:
+                'Ask U.S. Customs and Border Protection for approval at '
+                'least 48 hours ahead — and know the categories are narrow '
+                '(national defense, homeland security, law enforcement, '
+                'firefighting, medical evacuation, search and rescue, '
+                'disaster response, event operations). Ordinary commercial '
+                'or hobby flying inside the zone has no approval route.',
+            ref: _borderTfrRef,
+          ),
+        );
+      case TriState.unknown:
+        outcomes.add(
+          const RuleOutcome(
+            title: 'Do you have CBP approval for the border zone?',
+            status: OutcomeStatus.check,
+            plainWhy:
+                'Flying within 1 nautical mile north of the U.S.-Mexico '
+                'border needs CBP approval requested at least 48 hours '
+                'ahead. If you haven\'t requested it, you don\'t have it yet.',
+            ref: _borderTfrRef,
+          ),
+        );
+    }
+  }
+
+  // --- Vertical-structure inspections above the grid (JO 7200.23E ¶3-5) --
+  // Part 107 only: the order is the FAA's procedure for processing Part
+  // 107 airspace authorizations. It removes the ATC-facility coordination
+  // step for qualifying inspections — it does NOT remove the need for an
+  // authorization, and it is NOT a LAANC approval. Suppressed outside
+  // controlled airspace, where no authorization is needed at all.
+  final inControlledAirspace = (a.airspaceFromGrid &&
+          a.gridCeilingFt != null) ||
+      (!a.airspaceFromGrid && a.airspace == AirspaceClass.controlled);
+  if (!rec && inControlledAirspace && a.verticalStructureInspection == true) {
+    switch (a.withinStructureLimits) {
+      case TriState.yes:
+        if (a.airspaceAuthorization == TriState.yes) {
+          outcomes.add(
+            const RuleOutcome(
+              title: 'Tower inspection above the grid — FAADroneZone '
+                  'authorization on file',
+              status: OutcomeStatus.pass,
+              plainWhy:
+                  'You hold a FAADroneZone authorization for this inspection '
+                  'above the grid ceiling, and the JO 7200.23E ¶3-5 criteria '
+                  'are met, so no air traffic facility coordination was '
+                  'needed. Stay within the terms of your authorization.',
+              ref: _jo720023eRef,
+            ),
+          );
+        } else {
+          outcomes.add(
+            const RuleOutcome(
+              title: 'Tower inspection above the grid — use FAADroneZone, '
+                  'not LAANC',
+              status: OutcomeStatus.fixable,
+              plainWhy:
+                  'Your inspection meets the JO 7200.23E ¶3-5 criteria '
+                  '(within 100 feet of the structure, no more than 100 feet '
+                  'above its top, at least 2 nautical miles from any airport '
+                  'or heliport landing surface, in sight, 3 miles visibility, '
+                  'clear of clouds), so the FAA processes the authorization '
+                  'without coordinating with the air traffic facility. LAANC '
+                  'cannot approve above the grid ceiling — this goes through '
+                  'FAADroneZone as a manual Part 107 airspace authorization.',
+              fix:
+                  'Request a Part 107 airspace authorization in FAADroneZone '
+                  'for the inspection. It is a manual process — allow weeks, '
+                  'not minutes. This provision takes effect October 31, 2026.',
+              ref: _jo720023eRef,
+            ),
+          );
+        }
+      case TriState.no:
+        outcomes.add(
+          const RuleOutcome(
+            title: 'This inspection does not fit the fast path',
+            status: OutcomeStatus.info,
+            plainWhy:
+                'Outside the JO 7200.23E ¶3-5 limits (100-foot radius, 100 '
+                'feet above the top, 2 nautical miles from landing '
+                'surfaces, sight, visibility, cloud clearance), the '
+                'standard route applies: request the authorization in '
+                'FAADroneZone and expect the FAA to coordinate with the '
+                'air traffic facility. Bridges and power lines never '
+                'qualify — the provision covers vertical structures only.',
+            ref: _jo720023eRef,
+          ),
+        );
+      case TriState.unknown:
+        outcomes.add(
+          const RuleOutcome(
+            title: 'Do you meet the tower-inspection limits?',
+            status: OutcomeStatus.check,
+            plainWhy:
+                'The fast path needs ALL of these: within 100 feet of the '
+                'structure, no more than 100 feet above its top, at least 2 '
+                'nautical miles from any landing surface, in sight, 3 miles '
+                'visibility, and clear of clouds. If any one fails, the '
+                'standard authorization route applies instead.',
+            ref: _jo720023eRef,
           ),
         );
     }
