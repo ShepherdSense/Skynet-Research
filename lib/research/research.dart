@@ -439,6 +439,122 @@ class StubResearchService implements ResearchService {
         followUps: [
           'Can I fly my drone over a parade?',
           'What changed in the new Part 107?',
+          'Can I fly near the U.S.-Mexico border?',
+        ],
+      ),
+    ),
+    _Topic(
+      ['southern border', 'mexico border', 'u.s.-mexico border',
+       'border zone', 'border restriction', 'fly near the border',
+       'cbp approval'],
+      (q) => ResearchBrief(
+        question: 'Can I fly near the U.S.-Mexico border?',
+        covered: true,
+        shortAnswer:
+            'No unauthorized flights — from the surface to 400 feet '
+            'above the ground, within 1 nautical mile north of the '
+            'U.S.-Mexico border, from the Pacific coast to the Gulf '
+            'coast, from October 20, 2026 through October 19, 2027. '
+            'The band is designated National Defense Airspace. To fly '
+            'inside it, you need approval from U.S. Customs and Border '
+            'Protection, requested at least 48 hours ahead — and the '
+            'approved categories are narrow (national defense, homeland '
+            'security, law enforcement, firefighting, medical evacuation, '
+            'search and rescue, disaster response, event operations). '
+            'Ordinary commercial or hobby flying inside the zone has no '
+            'approval route. This covers every drone, including '
+            'recreational models under 250 grams.',
+        why: [
+          const BriefCitation(
+            label: 'FAA NOTAMs ZLA 6/9954, ZAB 6/9978, ZHU 6/9956',
+            why: 'The three NOTAMs that publish the restriction — the '
+                'legally controlling source. They enforce it from 0000 '
+                'UTC October 20, 2026 through 2359 UTC October 19, 2027.',
+          ),
+          const BriefCitation(
+            label: 'DOT / DoW / DHS announcement, October 16, 2026',
+            why: 'The joint announcement of the restriction, framing it '
+                'as protection for southern border airspace and a '
+                'counter to cartel drone activity. Its notice lists the '
+                'run as October 19, 2026 to October 19, 2027 — the '
+                'NOTAMs control where the two differ.',
+          ),
+          const BriefCitation(
+            label: '49 U.S.C. § 40103(b)(3)',
+            why: 'The statute behind National Defense Airspace '
+                'designations.',
+          ),
+        ],
+        gaps: [
+          'The NOTAMs are the controlling source — check them before '
+              'any flight near the border; press coverage and the '
+              'announcement round the dates differently.',
+          'This app cannot measure your distance to the border — '
+              'confirm you are outside the 1-nautical-mile band '
+              'yourself.',
+          'The restriction is temporary (through October 19, 2027) '
+              'and could be extended or changed.',
+        ],
+        followUps: [
+          'Do I need permission to fly near an airport?',
+          'Can I inspect a tower above the LAANC grid ceiling?',
+        ],
+      ),
+    ),
+    _Topic(
+      ['tower inspection', 'inspect a tower', 'vertical structure',
+       'above the grid ceiling', 'tower above the grid',
+       'laanc grid ceiling', 'grid ceiling'],
+      (q) => ResearchBrief(
+        question: 'Can I inspect a tower above the LAANC grid ceiling?',
+        covered: true,
+        shortAnswer:
+            'Yes — with a Part 107 airspace authorization from '
+            'FAADroneZone, not LAANC. Under FAA Order JO 7200.23E '
+            '¶3-5 (effective October 31, 2026), a visual-line-of-sight '
+            'inspection of a vertical structure above the facility-map '
+            'altitude is processed without coordinating with the air '
+            'traffic facility, as long as it stays within a 100-foot '
+            'radius of the structure and no more than 100 feet above '
+            'its top — the rule\'s own words: "Remains within a '
+            '100-foot radius of the structure and no more than 100 '
+            'feet above the upper-most portion of the vertical '
+            'structure." It must also stay at least 2 nautical miles '
+            'from any airport, heliport, seaplane base, or vertiport '
+            'landing surface (unless separately authorized), with 3 '
+            'miles visibility and clear of clouds. You still need the '
+            'authorization — the order removes the coordination step, '
+            'not the authorization. Bridges and power lines do not '
+            'qualify, and airspace delegated to the Department of War '
+            'is excluded.',
+        why: [
+          const BriefCitation(
+            label: 'FAA Order JO 7200.23E, ¶3-5',
+            why: 'The standing procedure: no facility coordination for '
+                'a qualifying vertical-structure inspection above the '
+                'facility-map altitude. Issued October 1, 2026, '
+                'effective October 31, 2026; cancels JO 7200.23D.',
+          ),
+          BriefCitation(
+            label: '14 CFR 107.41',
+            why: 'No operations in Class B/C/D or surface Class E '
+                'airspace without prior authorization — the '
+                'authorization this procedure processes.',
+            ref: _cfr('107', '107.41',
+                'Operation in certain airspace'),
+          ),
+        ],
+        gaps: [
+          'Before October 31, 2026, the old process applies — the '
+              'provision is not yet in effect.',
+          'FAADroneZone authorizations are manual, not instant — '
+              'allow weeks.',
+          'LAANC still cannot approve above the grid ceiling for any '
+              'flight, inspection or not.',
+        ],
+        followUps: [
+          'Do I need permission to fly near an airport?',
+          'Can I fly near the U.S.-Mexico border?',
         ],
       ),
     ),
@@ -561,7 +677,8 @@ class StubResearchService implements ResearchService {
           'at it. The research library currently answers questions '
           'about FAA drone rules (flying over people, night flight, '
           'registration, airspace permission, waivers, what changed '
-          'in Part 107), North Carolina drone law, and how military '
+          'in Part 107, border restrictions, tower inspections), '
+          'North Carolina drone law, and how military '
           'drone operations are governed. Try one of those, or use '
           'Search and Browse to read the regulation directly.',
       gaps: [
