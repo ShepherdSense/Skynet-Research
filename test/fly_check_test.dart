@@ -216,6 +216,160 @@ void main() {
       });
     });
 
+    group('October 2026 FAA changes', () {
+      test('border zone without CBP approval: CANNOT as described, '
+          'citing the TFR', () {
+        final a = baseRec()
+          ..nearSouthernBorder = true
+          ..cbpApproval = TriState.no;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.cannotAsDescribed);
+        final o = r.blocked.singleWhere(
+          (o) => o.title.contains('Southern border restriction'),
+        );
+        expect(o.ref?.citation, contains('6/9954'));
+        expect(o.fix, contains('48 hours'));
+        expect(o.plainWhy, contains('400 feet'));
+        expect(o.plainWhy, contains('1 nautical mile'));
+      });
+
+      test('border zone with CBP approval: passes, TFR window stated', () {
+        final a = baseRec()
+          ..nearSouthernBorder = true
+          ..cbpApproval = TriState.yes;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.canFly);
+        final o = r.passed.singleWhere(
+          (o) => o.title.contains('Border zone flight'),
+        );
+        expect(o.plainWhy, contains('October 19, 2027'));
+      });
+
+      test('border zone, approval unknown: check, never a silent pass', () {
+        final a = baseRec()
+          ..nearSouthernBorder = true
+          ..cbpApproval = TriState.unknown;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.notYet);
+        expect(
+          r.toFix.map((o) => o.title),
+          contains('Do you have CBP approval for the border zone?'),
+        );
+      });
+
+      test('not near the border: no border outcome at all', () {
+        final a = baseRec()..nearSouthernBorder = false;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.canFly);
+        expect(
+          r.outcomes.map((o) => o.title).join(' '),
+          isNot(contains('Border')),
+        );
+      });
+
+      test('unasked border question stays silent (existing flows unchanged)',
+          () {
+        final r = evaluateFlyCheck(baseRec());
+        expect(r.verdict, FlyVerdict.canFly);
+        expect(
+          r.outcomes.map((o) => o.title).join(' '),
+          isNot(contains('Border')),
+        );
+      });
+
+      test('tower inspection within limits: FAADroneZone path, not LAANC',
+          () {
+        final a = baseWork()
+          ..airspace = AirspaceClass.controlled
+          ..airspaceAuthorization = TriState.no
+          ..verticalStructureInspection = true
+          ..withinStructureLimits = TriState.yes;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.notYet);
+        final o = r.toFix.singleWhere(
+          (o) => o.title.contains('use FAADroneZone, not LAANC'),
+        );
+        expect(o.fix, contains('FAADroneZone'));
+        expect(o.ref?.citation, contains('JO 7200.23E'));
+        // The airspace fix must agree — no LAANC directive for this flight.
+        final airspaceFix = r.toFix.singleWhere(
+          (o) => o.title == 'Get airspace authorization first',
+        );
+        expect(airspaceFix.fix, contains('FAADroneZone'));
+        expect(airspaceFix.fix, isNot(contains('LAANC app')));
+      });
+
+      test('tower inspection within limits, authorized: CAN FLY', () {
+        final a = baseWork()
+          ..airspace = AirspaceClass.controlled
+          ..airspaceAuthorization = TriState.yes
+          ..verticalStructureInspection = true
+          ..withinStructureLimits = TriState.yes;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.canFly);
+        expect(
+          r.passed.map((o) => o.title),
+          contains('Tower inspection above the grid — FAADroneZone '
+              'authorization on file'),
+        );
+      });
+
+      test('tower inspection outside the limits: info only, verdict stands',
+          () {
+        final a = baseWork()
+          ..airspace = AirspaceClass.controlled
+          ..airspaceAuthorization = TriState.yes
+          ..verticalStructureInspection = true
+          ..withinStructureLimits = TriState.no;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.canFly);
+        final o = r.outcomes.singleWhere(
+          (o) => o.title.contains('does not fit the fast path'),
+        );
+        expect(o.status, OutcomeStatus.info);
+      });
+
+      test('tower inspection in uncontrolled airspace: no JO outcome', () {
+        final a = baseWork()
+          ..verticalStructureInspection = true
+          ..withinStructureLimits = TriState.yes;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.canFly);
+        expect(
+          r.outcomes.map((o) => o.title).join(' '),
+          isNot(contains('Tower inspection')),
+        );
+      });
+
+      test('recreational tower answer does not trigger the Part 107 path',
+          () {
+        final a = baseRec()
+          ..verticalStructureInspection = true
+          ..withinStructureLimits = TriState.yes;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.canFly);
+        expect(
+          r.outcomes.map((o) => o.title).join(' '),
+          isNot(contains('Tower inspection')),
+        );
+      });
+
+      test('grid ceiling with tower fast path: fix names FAADroneZone', () {
+        final a = baseWork()
+          ..airspaceFromGrid = true
+          ..gridCeilingFt = 200
+          ..airspaceAuthorization = TriState.no
+          ..verticalStructureInspection = true
+          ..withinStructureLimits = TriState.yes;
+        final r = evaluateFlyCheck(a);
+        expect(r.verdict, FlyVerdict.notYet);
+        final o = r.toFix.singleWhere(
+          (o) => o.title.contains('Get FAADroneZone authorization'),
+        );
+        expect(o.fix, contains('FAADroneZone'));
+      });
+    });
+
     test('every outcome in a full run carries a citation or is a pure '
         'airspace/weight check', () {
       final r = evaluateFlyCheck(baseWork());
