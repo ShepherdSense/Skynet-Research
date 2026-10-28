@@ -280,7 +280,10 @@ Shape:
 - A wizard tab (**Can I Fly?**) plus a card on Search. One plain question
   per step, big tap targets: why you're flying → drone weight →
   registration → TRUST / Remote Pilot certificate → Remote ID → airspace →
-  the flight plan (height, line of sight, over people, night).
+  the flight plan (height, line of sight, over people, night, border zone).
+  The airspace step also asks Part 107 flyers about tower inspections,
+  since that answer decides whether the authorization route is LAANC or
+  FAADroneZone (JO 7200.23E ¶3-5).
 - A pure-Dart rule engine (`lib/flycheck/fly_check.dart`,
   `evaluateFlyCheck`) maps answers to outcomes. It is a pure function —
   every scenario is unit-tested without the UI.
