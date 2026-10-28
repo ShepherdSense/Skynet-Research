@@ -1,7 +1,7 @@
 # Skynet Research
 
 *(Flutter package name stays `plainregs`; the product is Skynet
-Research. Icon: Cooper's real photo, 1600×1600 — Draco's call
+Research. Icon: Cooper's real photo, 1600×1600 — ShepherdSense's call
 2026-10-23, replacing the robot-face icon, which is kept at
 `robot_icon_v2_backup.png`.)*
 
@@ -19,7 +19,7 @@ War publications → all 50 state codes).
 ## ▶ Try the web sim
 
 **Live in your browser, nothing to install:**
-https://thedracospark-prog.github.io/Skynet-Research/sim/
+https://ShepherdSense.github.io/Skynet-Research/sim/
 
 The real app, compiled for the web. Everything bundled works right
 there — the Can I Fly checker with the offline FAA LAANC grid, the
@@ -72,11 +72,11 @@ landing page — it recolors the whole app, drone included.
   import a .txt/.md file, or save the official link). It stays on your
   device, becomes searchable like any built-in source, and opens in
   the Reader. Found on the Browse tab.
-- **Resources** — Draco's scheduled-research-source catalogue
+- **Resources** — ShepherdSense's scheduled-research-source catalogue
   (3,419 of the 3,529 deduplicated websites and social accounts
   from the updated 2026-10-23 inventory PDF, which adds 184 review
   sources including new Substack and Bluesky entries — Telegram
-  entries excluded per Draco): searchable, filterable by platform and
+  entries excluded per ShepherdSense): searchable, filterable by platform and
   topic tag (UAS, CUAS, RAS, EW…), each entry showing its report codes
   and kind; tap to open the source. Parsed by
   `tool/build_resources_bundle.py`, which reconciles every count
