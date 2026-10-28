@@ -57,15 +57,20 @@ class _FlyCheckScreenState extends State<FlyCheckScreen> {
       case 'registration':
       case 'credential':
       case 'remoteId':
-      case 'airspace':
         return true; // tri-state / defaulted pickers always have a value
+      case 'airspace':
+        // Work flyers must answer the tower-inspection question — it
+        // decides whether the authorization route is LAANC or
+        // FAADroneZone. Recreational flyers skip it.
+        return !_work || _a.verticalStructureInspection != null;
       case 'plan':
         // nightReady may stay "unknown" — that is itself a real answer
         // (the engine turns it into a check outcome, never a silent pass).
         return _a.above400 != null &&
             _a.keepInSight != null &&
             _a.overPeople != null &&
-            _a.atNight != null;
+            _a.atNight != null &&
+            _a.nearSouthernBorder != null;
       default:
         return true;
     }
@@ -108,6 +113,10 @@ class _FlyCheckScreenState extends State<FlyCheckScreen> {
       _a.overPeople = null;
       _a.atNight = null;
       _a.nightReady = TriState.unknown;
+      _a.nearSouthernBorder = null;
+      _a.cbpApproval = TriState.unknown;
+      _a.verticalStructureInspection = null;
+      _a.withinStructureLimits = TriState.unknown;
       _a.airspaceFromGrid = false;
       _a.gridCeilingFt = null;
       _gridMessage = null;
@@ -439,10 +448,40 @@ class _FlyCheckScreenState extends State<FlyCheckScreen> {
               _a.airspace = v;
             },
           ),
+          if (_work)
+            _yesNo(
+              label: 'Are you inspecting a vertical structure (tower, '
+                  'high-rise) above the LAANC grid ceiling?',
+              value: _a.verticalStructureInspection,
+              onPick: (v) => _a.verticalStructureInspection = v,
+            ),
+          if (_work && _a.verticalStructureInspection == true) ...[
+            const SizedBox(height: 16),
+            Text(
+              'Do you meet ALL of these: within 100 feet of the '
+              'structure, no more than 100 feet above its top, at '
+              'least 2 nautical miles from any airport or heliport '
+              'landing surface, in sight, 3 miles visibility, clear '
+              'of clouds?',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            _triOptions(
+              value: _a.withinStructureLimits,
+              onPick: (v) => _a.withinStructureLimits = v,
+              yesLabel: 'Yes, all of them',
+              noLabel: 'No, at least one fails',
+              unknownLabel: 'Not sure',
+            ),
+          ],
           if (showAuthQuestion) ...[
             const SizedBox(height: 16),
             Text(
-              'Do you have FAA authorization (LAANC) for that spot?',
+              _a.verticalStructureInspection == true &&
+                      _a.withinStructureLimits == TriState.yes
+                  ? 'Do you have FAA authorization (FAADroneZone) for '
+                        'that inspection?'
+                  : 'Do you have FAA authorization (LAANC) for that spot?',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -479,6 +518,28 @@ class _FlyCheckScreenState extends State<FlyCheckScreen> {
             value: _a.atNight,
             onPick: (v) => _a.atNight = v,
           ),
+          _yesNo(
+            label: 'Will you fly within 1 nautical mile north of the '
+                'U.S.-Mexico border?',
+            value: _a.nearSouthernBorder,
+            onPick: (v) => _a.nearSouthernBorder = v,
+          ),
+          if (_a.nearSouthernBorder == true) ...[
+            const SizedBox(height: 16),
+            Text(
+              'Flights in that zone need CBP approval requested at '
+              'least 48 hours ahead. Do you have it?',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            _triOptions(
+              value: _a.cbpApproval,
+              onPick: (v) => _a.cbpApproval = v,
+              yesLabel: 'Yes',
+              noLabel: 'No',
+              unknownLabel: 'Not sure',
+            ),
+          ],
           if (_work && _a.atNight == true) ...[
             const SizedBox(height: 16),
             Text(
