@@ -60,6 +60,33 @@ void main() {
       }
     });
 
+    test('October 2026 FAA topics: border TFR and tower inspection',
+        () async {
+      final border =
+          await svc.ask('Can I fly near the U.S.-Mexico border?');
+      expect(border.covered, isTrue);
+      expect(border.shortAnswer, contains('1 nautical mile'));
+      expect(border.shortAnswer, contains('400 feet'));
+      expect(border.shortAnswer, contains('October 19, 2027'));
+      expect(
+        border.why.map((c) => c.label).join(' '),
+        contains('6/9954'),
+      );
+      expect(border.gaps, isNotEmpty);
+
+      final tower = await svc.ask(
+        'Can I inspect a tower above the LAANC grid ceiling?',
+      );
+      expect(tower.covered, isTrue);
+      expect(tower.shortAnswer, contains('FAADroneZone'));
+      expect(tower.shortAnswer, contains('100-foot'));
+      expect(
+        tower.why.map((c) => c.label).join(' '),
+        contains('JO 7200.23E'),
+      );
+      expect(tower.gaps, isNotEmpty);
+    });
+
     test('uncovered question is honest: no answer, gaps named', () async {
       final brief = await svc.ask(
         'What are the drone rules for filming weddings in Texas?',
