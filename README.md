@@ -1,9 +1,8 @@
 # Skynet Research
 
 *(Flutter package name stays `plainregs`; the product is Skynet
-Research. Icon: Cooper's real photo, 1600×1600 — ShepherdSense's call
-2026-10-23, replacing the robot-face icon, which is kept at
-`robot_icon_v2_backup.png`.)*
+Research. Icon: cybernetic Cooper — half natural Aussie, half chrome cyborg
+with cable hair and a glowing purple eye — ShepherdSense's call 2026-10-28.)*
 
 Find any regulation fast, read the real text, and read a plain-English
 explanation of it — **alongside the original, never instead of it.**
