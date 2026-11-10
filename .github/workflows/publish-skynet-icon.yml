@@ -1,0 +1,18 @@
+name: Publish Skynet icon
+on:
+  push:
+    paths:
+      - .github/workflows/publish-skynet-icon.yml
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name "ShepherdSense"
+          git config user.email "shepherdsense@users.noreply.github.com"
+          git mv -f docs/sim/assets/assets/skynet_icon_final_1024.png docs/sim/assets/assets/icon/icon.png
+          git commit -m "Skynet banner icon: Terminator Cooper replaces real photo"
+          git push
